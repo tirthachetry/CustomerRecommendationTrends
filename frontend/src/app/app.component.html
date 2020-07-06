@@ -1,0 +1,129 @@
+<mat-card class="search-container">
+    <mat-card-title><b>DATAWEAVE Recommendation System</b></mat-card-title>
+    <input (keyup.enter)="onSearchChange(searchStr)" [(ngModel)]="searchStr" [matAutocomplete]="auto" id="search-bar"
+           placeholder="What can I help you with today?"
+           type="text">
+    <a href="#"><img (click)="getRecommendation(searchStr)"
+                     class="search-icon"
+                     src="http://www.endlessicons.com/wp-content/uploads/2012/12/search-icon.png"></a>
+    <mat-autocomplete #auto="matAutocomplete">
+        <mat-option (click)="getRecommendation(ele)" *ngFor="let ele of searchData"
+                    [value]=ele>
+            <span>{{ele}}</span>
+        </mat-option>
+    </mat-autocomplete>
+</mat-card>
+<div style="display: flex">
+    <div style="flex: 1">
+        <div *ngFor="let elem of recommendedData">
+            <div class="container">
+                <header>
+                    <i aria-hidden="true" class="fa fa-angle-left"></i>
+                    <span class="item-location">
+                    <a href="#">{{elem.meta[0]}}</a>
+                </span>
+                    <i aria-hidden="true" class="fa fa-times"></i>
+                </header>
+                <div class="container-left">
+                    <img
+                            alt=""
+                            src={{elem.thumbnail[0]}}>
+                </div>
+                <div class="container-right">
+                    <h3>{{elem.title[0] | slice:0:80}}</h3>
+                    <h4>${{elem.mrp[0]}}</h4>
+                    <div [innerHTML]="elem.description | slice:0:150"></div>
+                    <!-- <p class="item-description" >{{elem.description}}</p> -->
+                    <div>
+                        <span>Size: </span> {{elem.size[0]}}
+                    </div>
+                    <div>
+                        <span>Brand: </span> {{elem.brand[0]}}
+                    </div>
+                    <div>
+                        <span>Category: </span> {{elem.category[0]}}
+                    </div>
+                    <div class="color-picker">
+                        <span>Colors:</span>
+                        <div *ngIf="!elem.isString">
+                            <div *ngFor="let slug of elem.color_slug" [ngStyle]="{ background: slug }"
+                                 class="color"></div>
+                        </div>
+
+                        <div *ngIf="elem.isString">{{elem.color_slug}}</div>
+                    </div>
+
+                </div>
+                <div class="action-button-container">
+                    <button class="addToCart" style="margin-left: 300px;" type="submit"><i aria-hidden="true" class="fa
+                        fa-shopping-cart"></i> <span>View Details</span></button>
+                    <button (click)=openSimilarItemsModal(elem) class="wishlist" style="margin-left: 300px;"
+                            type="button"><i aria-hidden="true"
+                                             class="fa
+                        fa-heart"></i> View Similar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="flex: 1;margin-left: 70px">
+        <div *ngFor="let elem of intentData">
+            <div class="container">
+                <header>
+                    <i aria-hidden="true" class="fa fa-angle-left"></i>
+                    <span class="item-location">
+                    <a *ngFor="let e of elem.meta[0]" [ngClass]="{'active-item' :eleExist(e)}" href="#">{{e }} </a>
+                </span>
+                    <i aria-hidden="true" class="fa fa-times"></i>
+                </header>
+                <div class="container-left">
+                    <img
+                            alt=""
+                            src={{elem.thumbnail[0]}}>
+                </div>
+                <div class="container-right">
+                    <h3>{{elem.title[0]| slice:0:80}}</h3>
+                    <h4>${{elem.mrp[0]}}</h4>
+                    <div [innerHTML]="elem.description | slice:0:150"></div>
+                    <!-- <p class="item-description" >{{elem.description}}</p> -->
+                    <div>
+                        <span>Size: </span> {{elem.size[0]}}
+                    </div>
+                    <div [ngClass]="{'active-item' :brandExist(elem)}">
+                        <span>Brand: </span> {{elem.brand[0]}}
+                    </div>
+                    <div [ngClass]="{'active-item' :categoryExist(elem)}">
+                        <span>Category: </span> {{elem.category[0]}}
+                    </div>
+                    <div class="color-picker">
+                        <span [ngClass]="{'active-item' :colorExist(elem)}">Colors:</span>
+                        <div *ngIf="!elem.isString">
+                            <div *ngFor="let slug of elem.color_slug" [ngStyle]="{ background: slug }"
+                                 class="color"></div>
+                        </div>
+
+                        <div *ngIf="elem.isString">{{elem.color_slug}}</div>
+                    </div>
+
+                </div>
+                <div class="action-button-container">
+                    <button class="addToCart" style="margin-left: 300px;" type="submit"><i aria-hidden="true" class="fa
+                        fa-shopping-cart"></i> <span>View Details</span></button>
+                    <button (click)=openSimilarItemsModal(elem) class="wishlist" style="margin-left: 300px;"
+                            type="button"><i aria-hidden="true"
+                                             class="fa
+                        fa-heart"></i> View Similar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<mat-card *ngIf="recommendedData.length === 0" style="margin: 20px 70px 0;">
+    <h4><span style="color: darkblue">Bugzinga!!</span> Seach to view results.. </h4>
+</mat-card>
+<div *ngIf="isLoading" class="loading-indicator">
+    <mat-progress-spinner mode="indeterminate" style="color: #ff9930"></mat-progress-spinner>
+</div>
